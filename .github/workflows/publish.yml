@@ -46,15 +46,10 @@ jobs:
     - name: Package client
       run: dotnet run --project Content.Packaging client --no-wipe-release
 
-    - name: Publish version
-      run: Tools/publish_multi_request.py
-      env:
-        PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
-        GITHUB_REPOSITORY: ${{ vars.GITHUB_REPOSITORY }}
-
-    - name: Publish changelog (Discord)
-      continue-on-error: true
-      run: Tools/actions_changelogs_since_last_run.py
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DISCORD_WEBHOOK_URL: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
+    - name: Upload zips to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.run_number }}   # or an input/explicit tag
+        name: ${{ github.run_number }}
+        body: Automated release for run ${{ github.run_id }}
+        files: release/*.zip
